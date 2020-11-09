@@ -2,12 +2,14 @@ package com.kastrupf.algafood.api.controller;
 
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +29,7 @@ public class RestaurantController {
 	@Autowired
 	private RegistreRestaurantService registreRestaurant;
 	
-		@GetMapping
+	@GetMapping
 	public List<Restaurant> lister() {
 		return restaurantRepository.tous();
 	}
@@ -55,5 +57,24 @@ public class RestaurantController {
 		}
 	}
 	
-	
+	@PutMapping("/{id}")
+	public ResponseEntity<?> mettreAJour(@PathVariable Long id,
+			@RequestBody Restaurant restaurant) {
+			try {
+				Restaurant restaurantActuel = restaurantRepository.parId(id);
+		
+				if (restaurantActuel != null) {
+					BeanUtils.copyProperties(restaurant, restaurantActuel, "id");
+		
+					restaurantActuel = registreRestaurant.ajouter(restaurantActuel);
+					return ResponseEntity.ok(restaurantActuel); 
+				}
+		
+				return ResponseEntity.notFound().build();
+				
+			} catch (EntityNotFoundException e) {
+				return ResponseEntity.badRequest()
+					.body(e.getMessage());
+			}
+     	}
 }
