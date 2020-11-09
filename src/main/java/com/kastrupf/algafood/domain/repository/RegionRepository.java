@@ -9,6 +9,6 @@ public interface RegionRepository {
 	List<Region> toutes();
 	Region parId(Long id);
 	Region ajouter(Region region);
-	void supprimer(Region region);
+	void supprimer(Long id);
 
 }

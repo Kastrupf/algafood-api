@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,10 +35,15 @@ public class RegionRepositoryImpl implements RegionRepository{
 		return manager.merge(region);
 	}
 	
-	@Override
 	@Transactional
-	public void supprimer(Region region) {
-		region = parId(region.getId());
+	@Override
+	public void supprimer(Long id) {
+		Region region = parId(id);
+		
+		if (region == null) {
+			throw new EmptyResultDataAccessException(1);
+		}
+		
 		manager.remove(region);
 	}
 
