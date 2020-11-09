@@ -9,6 +9,6 @@ public interface VilleRepository {
 	List<Ville> toutes();
 	Ville parId(Long id);
 	Ville ajouter(Ville ville);
-	void supprimer(Ville ville);
+	void supprimer(Long id);
 
 }

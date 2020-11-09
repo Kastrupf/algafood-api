@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,9 +37,15 @@ public class VilleRepositoryImpl implements VilleRepository{
 	
 	@Override
 	@Transactional
-	public void supprimer(Ville ville) {
-		ville = parId(ville.getId());
+	public void supprimer(Long id) {
+		Ville ville = parId(id);
+		
+		if (ville == null) {
+			throw new EmptyResultDataAccessException(1);
+		}
+			
 		manager.remove(ville);
 	}
 
 }
+
