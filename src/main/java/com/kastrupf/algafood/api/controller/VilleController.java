@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.kastrupf.algafood.domain.exception.EntityInUseException;
@@ -51,11 +50,18 @@ public class VilleController {
 	}
 	
 	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public Ville ajouter(@RequestBody Ville ville) {
-		return registreVille.ajouter(ville);
+	public ResponseEntity<?> ajouter(@RequestBody Ville ville) {
+		try {
+			ville = registreVille.ajouter(ville);
+			
+			return ResponseEntity.status(HttpStatus.CREATED)
+					.body(ville);
+		} catch (EntityNotFoundException e) {
+			return ResponseEntity.badRequest()
+					.body(e.getMessage());
+		}
 	}
-	
+			
 	@PutMapping("/{id}")
 	public ResponseEntity<?> mettreAJour(@PathVariable Long id,
 			@RequestBody Ville ville) {

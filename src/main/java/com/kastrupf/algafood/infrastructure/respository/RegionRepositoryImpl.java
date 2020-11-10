@@ -19,14 +19,14 @@ public class RegionRepositoryImpl implements RegionRepository{
 	private EntityManager manager;
 	
 	@Override
-	public Region parId(Long id) {
-		return manager.find(Region.class, id);
-	}
-	
-	@Override
 	public List<Region> toutes() {
 		 return manager.createQuery("from Region", Region.class)
 				 .getResultList();
+	}
+	
+	@Override
+	public Region parId(Long id) {
+		return manager.find(Region.class, id);
 	}
 	
 	@Override

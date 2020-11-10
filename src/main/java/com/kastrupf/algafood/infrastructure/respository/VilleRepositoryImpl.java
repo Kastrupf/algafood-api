@@ -19,14 +19,14 @@ public class VilleRepositoryImpl implements VilleRepository{
 	private EntityManager manager;
 	
 	@Override
-	public Ville parId(Long id) {
-		return manager.find(Ville.class, id);
-	}
-	
-	@Override
 	public List<Ville> toutes() {
 		 return manager.createQuery("from Ville", Ville.class)
 				 .getResultList();
+	}
+	
+	@Override
+	public Ville parId(Long id) {
+		return manager.find(Ville.class, id);
 	}
 	
 	@Override

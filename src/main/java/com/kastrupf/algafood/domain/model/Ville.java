@@ -25,8 +25,7 @@ public class Ville {
 	private String nom;
 	
 	@ManyToOne
-	@JoinColumn(nullable = false)
+	@JoinColumn(name = "region_id", nullable = false)
 	private Region region;
-	
-			
+		
 }
