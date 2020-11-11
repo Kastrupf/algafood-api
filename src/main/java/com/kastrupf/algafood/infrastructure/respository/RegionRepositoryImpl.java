@@ -6,13 +6,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kastrupf.algafood.domain.model.Region;
 import com.kastrupf.algafood.domain.repository.RegionRepository;
 
-@Component
+@Repository
 public class RegionRepositoryImpl implements RegionRepository{
 
 	@PersistenceContext

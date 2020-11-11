@@ -5,13 +5,13 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.kastrupf.algafood.domain.model.MoyenDePayment;
 import com.kastrupf.algafood.domain.repository.MoyenDePaymentRepository;
 
-@Component
+@Repository
 public class MoyenDePaymentRepositoryImpl implements MoyenDePaymentRepository{
 
 	@PersistenceContext
