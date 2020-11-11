@@ -17,12 +17,12 @@ public class RegistreCuisineService {
 	private CuisineRepository cuisines;
 	
 		public Cuisine ajouter(Cuisine cuisine) {
-		return cuisines.ajouter(cuisine);
+		return cuisines.save(cuisine);
 	}
 		
 		public void supprimer(Long id) {
 			try {
-				cuisines.supprimer(id);
+				cuisines.deleteById(id);
 				
 			} catch (EmptyResultDataAccessException e) {	
 				throw new EntityNotFoundException(

@@ -20,17 +20,14 @@ public class RegistreRestaurantService {
 	
 		public Restaurant ajouter(Restaurant restaurant) {
 			Long cuisineId = restaurant.getCuisine().getId();
-			Cuisine cuisine = cuisines.parId(cuisineId);
-			
-			if (cuisine == null) {
-				throw new EntityNotFoundException(
-						String.format("Il n'y a pas de registre de cuisine avec le code %d", cuisineId));
-			}
-			
+			Cuisine cuisine = cuisines.findById(cuisineId)
+					.orElseThrow(() -> new EntityNotFoundException(
+						String.format("Il n'y a pas de registre de cuisine avec le code %d", cuisineId)));
+								
 			restaurant.setCuisine(cuisine);
 			
-		return restaurants.ajouter(restaurant);
-	}
+			return restaurants.ajouter(restaurant);
+		}
 		
 /*		public void supprimer(Long id) {
 			try {

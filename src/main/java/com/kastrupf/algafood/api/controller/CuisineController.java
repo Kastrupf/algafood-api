@@ -1,6 +1,7 @@
 package com.kastrupf.algafood.api.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,16 +35,16 @@ public class CuisineController {
 	
 	@GetMapping
 	public List<Cuisine> lister() {
-		return cuisineRepository.toutes();
+		return cuisineRepository.findAll();
 	}
 				
 	@GetMapping("/{id}")
 	public ResponseEntity<Cuisine> chercher(@PathVariable Long id) {
-		Cuisine cuisine = cuisineRepository.parId(id);
+		Optional<Cuisine> cuisine = cuisineRepository.findById(id);
 		
-		if (cuisine != null) {
+		if (cuisine.isPresent()) {
 //			return ResponseEntity.status(HttpStatus.OK).body(cuisine);
-			return ResponseEntity.ok(cuisine);
+			return ResponseEntity.ok(cuisine.get());
 		}
 		
 //		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -59,21 +60,21 @@ public class CuisineController {
 	@PutMapping("/{id}")
 	public ResponseEntity<Cuisine> mettreAJour(@PathVariable Long id,
 			@RequestBody Cuisine cuisine) {
-		Cuisine cuisineActuelle = cuisineRepository.parId(id);
+		Optional<Cuisine> cuisineActuelle = cuisineRepository.findById(id);
 		
-		if (cuisineActuelle != null) { 			
+		if (cuisineActuelle.isPresent()) { 			
 //			cuisineActuelle.setNom(cuisine.getNom());
-			BeanUtils.copyProperties(cuisine, cuisineActuelle, "id");
+			BeanUtils.copyProperties(cuisine, cuisineActuelle.get(), "id");
 		
-			cuisineActuelle = registreCuisine.ajouter(cuisineActuelle);
-			return ResponseEntity.ok(cuisineActuelle); 
+			Cuisine cuisineSaved = registreCuisine.ajouter(cuisineActuelle.get());
+			return ResponseEntity.ok(cuisineSaved); 
 		}
 		
 		return ResponseEntity.notFound().build();
 	}
 	
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Cuisine> supprimer(@PathVariable Long id) {
+	public ResponseEntity<?> supprimer(@PathVariable Long id) {
 		try {
 			registreCuisine.supprimer(id);
 			return ResponseEntity.noContent().build();
@@ -82,7 +83,8 @@ public class CuisineController {
 			return ResponseEntity.notFound().build();
 		
 		} catch (EntityInUseException e) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			return ResponseEntity.status(HttpStatus.CONFLICT).
+					body(e.getMessage());
 		}
 	}
 }
