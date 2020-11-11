@@ -8,6 +8,6 @@ import com.kastrupf.algafood.domain.model.Cuisine;
 @Repository
 public interface CuisineRepository extends JpaRepository<Cuisine, Long>{
 	
-//	List<Cuisine> chercherParNom(String nom);
+//	List<Cuisine> nom(String nom);
 
 }
