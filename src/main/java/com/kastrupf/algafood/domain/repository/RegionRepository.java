@@ -1,14 +1,11 @@
 package com.kastrupf.algafood.domain.repository;
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.kastrupf.algafood.domain.model.Region;
 
-public interface RegionRepository {
-	
-	List<Region> toutes();
-	Region parId(Long id);
-	Region ajouter(Region region);
-	void supprimer(Long id);
+@Repository
+public interface RegionRepository extends JpaRepository<Region, Long>{
 
 }

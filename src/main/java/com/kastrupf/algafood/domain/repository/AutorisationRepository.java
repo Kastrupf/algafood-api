@@ -1,14 +1,11 @@
 package com.kastrupf.algafood.domain.repository;
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.kastrupf.algafood.domain.model.Autorisation;
 
-public interface AutorisationRepository {
-	
-	List<Autorisation> toutes();
-	Autorisation parId(Long id);
-	Autorisation ajouter(Autorisation autorisation);
-	void supprimer(Autorisation autorisation);
-
+@Repository
+public interface AutorisationRepository extends JpaRepository<Autorisation, Long> {
+		
 }

@@ -17,12 +17,12 @@ public class RegistreRegionService {
 	private RegionRepository regionRepository;
 	
 	public Region ajouter(Region region) {
-		return regionRepository.ajouter(region);
+		return regionRepository.save(region);
 	}
 	
 	public void supprimer(Long id) {
 		try {
-			regionRepository.supprimer(id);
+			regionRepository.deleteById(id);
 			
 		} catch (EmptyResultDataAccessException e) {
 			throw new EntityNotFoundException(

@@ -26,22 +26,7 @@ public class RegistreRestaurantService {
 								
 			restaurant.setCuisine(cuisine);
 			
-			return restaurants.ajouter(restaurant);
+			return restaurants.save(restaurant);
 		}
-		
-/*		public void supprimer(Long id) {
-			try {
-				cuisines.supprimer(id);
-				
-			} catch (EmptyResultDataAccessException e) {	
-				throw new EntityNotFoundException(
-						String.format("Il n'y a pas de cuisine enregistrée avec le code %d", id));
-				
-			} catch (DataIntegrityViolationException e) {
-				throw new EntityInUseException(
-						String.format("La cuisine code %d ne peut pas être retirée car elle est en cours d'utilisation", id));
-			}
-	}
-*/
 
 }

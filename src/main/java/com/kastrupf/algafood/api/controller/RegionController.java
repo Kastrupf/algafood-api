@@ -1,6 +1,7 @@
 package com.kastrupf.algafood.api.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +35,15 @@ public class RegionController {
 	
 	@GetMapping
 	public List<Region> lister() {
-		return regionRepository.toutes();
+		return regionRepository.findAll();
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Region> parId(@PathVariable Long id) {
-		Region region = regionRepository.parId(id);
+		Optional <Region> region = regionRepository.findById(id);
 		
-		if (region != null) {
-			return ResponseEntity.ok(region);
+		if (region.isPresent()) {
+			return ResponseEntity.ok(region.get());
 		}
 		
 		return ResponseEntity.notFound().build();
@@ -57,7 +58,7 @@ public class RegionController {
 	@PutMapping("/{id}")
 	public ResponseEntity<Region> mettreAJour(@PathVariable Long id,
 			@RequestBody Region region) {
-		Region regionActuelle = regionRepository.parId(id);
+		Region regionActuelle = regionRepository.findById(id).orElse(null);
 			
 		if (regionActuelle != null) {
 			BeanUtils.copyProperties(region, regionActuelle, "id");

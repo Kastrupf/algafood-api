@@ -1,14 +1,11 @@
 package com.kastrupf.algafood.domain.repository;
 
-import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.kastrupf.algafood.domain.model.Restaurant;
 
-public interface RestaurantRepository {
-	
-	List<Restaurant> tous();
-	Restaurant parId(Long id);
-	Restaurant ajouter(Restaurant restaurant);
-	void supprimer(Restaurant restaurant);
-
+@Repository
+public interface RestaurantRepository extends JpaRepository<Restaurant, Long>{
+		
 }

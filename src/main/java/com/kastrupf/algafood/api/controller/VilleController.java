@@ -1,6 +1,7 @@
 package com.kastrupf.algafood.api.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,19 +34,17 @@ public class VilleController {
 	
 	@GetMapping
 	public List<Ville> lister() {
-		return villeRepository.toutes();
+		return villeRepository.findAll();
 	}
 				
 	@GetMapping("/{id}")
 	public ResponseEntity<Ville> chercher(@PathVariable Long id) {
-		Ville ville = villeRepository.parId(id);
+		Optional <Ville> ville = villeRepository.findById(id);
 		
-		if (ville != null) {
-//			return ResponseEntity.status(HttpStatus.OK).body(ville);
-			return ResponseEntity.ok(ville);
+		if (ville.isPresent()) {
+			return ResponseEntity.ok(ville.get());
 		}
 		
-//		return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		return ResponseEntity.notFound().build();
 	}
 	
@@ -66,7 +65,7 @@ public class VilleController {
 	public ResponseEntity<?> mettreAJour(@PathVariable Long id,
 			@RequestBody Ville ville) {
 		try {
-			Ville villeActuelle = villeRepository.parId(id);
+			Ville villeActuelle = villeRepository.findById(id).orElse(null);
 			
 			if (villeActuelle != null) {
 				BeanUtils.copyProperties(ville, villeActuelle, "id");

@@ -23,21 +23,18 @@ public class RegistreVilleService {
 	
 	public Ville ajouter(Ville ville) {
         Long regionId = ville.getRegion().getId();
-        Region region = regions.parId(regionId);
-        
-        if (region == null) {
-            throw new EntityNotFoundException(
-                String.format("Il n'y a pas de région enregistrée avec le code %d", regionId));
-        }
-        
+        Region region = regions.findById(regionId)
+        		.orElseThrow(() -> new EntityNotFoundException(
+                String.format("Il n'y a pas de région enregistrée avec le code %d", regionId)));
+              
         ville.setRegion(region);
         
-        return villes.ajouter(ville);
+        return villes.save(ville);
     }
 		
 		public void supprimer(Long id) {
 			try {
-				villes.supprimer(id);
+				villes.deleteById(id);
 				
 			} catch (EmptyResultDataAccessException e) {	
 				throw new EntityNotFoundException(

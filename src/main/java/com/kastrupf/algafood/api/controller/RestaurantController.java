@@ -3,6 +3,7 @@ package com.kastrupf.algafood.api.controller;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,15 +37,15 @@ public class RestaurantController {
 	
 	@GetMapping
 	public List<Restaurant> lister() {
-		return restaurantRepository.tous();
+		return restaurantRepository.findAll();
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Restaurant> parId(@PathVariable Long id) {
-		Restaurant restaurant = restaurantRepository.parId(id);
+		Optional <Restaurant> restaurant = restaurantRepository.findById(id);
 		
-		if (restaurant != null) {
-			return ResponseEntity.ok(restaurant);
+		if (restaurant.isPresent()) {
+			return ResponseEntity.ok(restaurant.get());
 		}
 		
 		return ResponseEntity.notFound().build();
@@ -66,7 +67,8 @@ public class RestaurantController {
 	public ResponseEntity<?> mettreAJour(@PathVariable Long id,
 			@RequestBody Restaurant restaurant) {
 			try {
-				Restaurant restaurantActuel = restaurantRepository.parId(id);
+				Restaurant restaurantActuel = restaurantRepository
+						.findById(id).orElse(null);
 		
 				if (restaurantActuel != null) {
 					BeanUtils.copyProperties(restaurant, restaurantActuel, "id");
@@ -86,11 +88,9 @@ public class RestaurantController {
 	@PatchMapping("/{id}")
 	public ResponseEntity<?> mettreAJourPartiel(@PathVariable Long id,
 			@RequestBody Map<String, Object> data) {
-		Restaurant restaurantActuel = restaurantRepository.parId(id);
+		Restaurant restaurantActuel = restaurantRepository.findById(id).orElse(null);
 		
-		if (restaurantActuel == null) {
-			return ResponseEntity.notFound().build();
-		}
+		
 		
 		merge(data, restaurantActuel);
 		
