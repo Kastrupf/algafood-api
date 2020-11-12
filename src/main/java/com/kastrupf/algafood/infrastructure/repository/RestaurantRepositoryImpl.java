@@ -1,12 +1,12 @@
 package com.kastrupf.algafood.infrastructure.repository;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import javax.persistence.criteria.Predicate;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -21,6 +21,35 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryQueries {
 	private EntityManager manager;
 	
 	@Override
+	public List<Restaurant> find(String nom, 
+			BigDecimal fraisTransportInitial, BigDecimal fraisTransportFinal) {
+		var builder = manager.getCriteriaBuilder();
+		
+		var criteria = builder.createQuery(Restaurant.class);
+		var root = criteria.from(Restaurant.class);
+
+		var predicates = new ArrayList<Predicate>();
+		
+		if (StringUtils.hasText(nom)) {
+			predicates.add(builder.like(root.get("nom"), "%" + nom + "%"));
+		}
+		
+		if (fraisTransportInitial != null) {
+			predicates.add(builder.greaterThanOrEqualTo(root.get("fraisTransport"), fraisTransportInitial));
+		}
+		
+		if (fraisTransportFinal != null) {
+			predicates.add(builder.lessThanOrEqualTo(root.get("fraisTransport"), fraisTransportFinal));
+		}
+		
+		criteria.where(predicates.toArray(new Predicate[0]));
+		
+		var query = manager.createQuery(criteria);
+		return query.getResultList();
+	}
+		
+	
+/*	@Override
 	public List<Restaurant> find(String nom, 
 			BigDecimal fraisTransportInitial, BigDecimal fraisTransportFinal) {
 		
@@ -51,5 +80,6 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryQueries {
 
 		return query.getResultList();
 	}
+*/
 	
 }
