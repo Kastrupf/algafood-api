@@ -72,7 +72,7 @@ public class RestaurantController {
 		
 				if (restaurantActuel != null) {
 					BeanUtils.copyProperties(restaurant, restaurantActuel, 
-							"id", "moyensDePayement", "adresse");
+							"id", "moyensDePayement", "adresse", "dateRegistre", "produits");
 		
 					restaurantActuel = registreRestaurant.ajouter(restaurantActuel);
 					return ResponseEntity.ok(restaurantActuel); 
