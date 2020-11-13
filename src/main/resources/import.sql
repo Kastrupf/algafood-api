@@ -2,16 +2,18 @@ insert into cuisine (id, nom) values (1, 'Italienne');
 insert into cuisine (id, nom) values (2, 'Indienne');
 insert into cuisine (id, nom) values (3, 'Française');
 
-insert into restaurant (id, nom, frais_transport, cuisine_id) values (1, 'LaMama', 5.25, 1);
-insert into restaurant (id, nom, frais_transport, cuisine_id) values (2, 'PraiadoPepê', 2.66, 1);
-insert into restaurant (id, nom, frais_transport, cuisine_id) values (3, 'Shakira', 3.56, 2);
-
 insert into region (id, nom) values (1, 'Nouvelle Aquitaine');
 insert into region (id, nom) values (2, 'Bourgogne');
 
 insert into ville (id, nom, region_id) values (1, 'Bordeaux', 1);
 insert into ville (id, nom, region_id) values (2, 'Dijon', 2);
 insert into ville (id, nom, region_id) values (3, 'Beaune', 2);
+
+insert into restaurant (id, nom, frais_transport, cuisine_id) values (1, 'LaMama', 5.25, 1);
+insert into restaurant (id, nom, frais_transport, cuisine_id) values (2, 'PraiadoPepê', 2.66, 1);
+insert into restaurant (id, nom, frais_transport, cuisine_id) values (3, 'Shakira', 3.56, 2);
+insert into restaurant (id, nom, frais_transport, cuisine_id, adresse_ville_id, adresse_code_postal, adresse_numero, adresse_voie, adresse_complement) values (4, 'Woko', 0.00, 2, 2, '21000', '13', 'rue Petitot', 'RDC');
+
 
 insert into moyen_de_payment (id, description) values (1, 'carte');
 insert into moyen_de_payment (id, description) values (2, 'virement');
