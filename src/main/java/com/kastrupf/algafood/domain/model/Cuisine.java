@@ -27,7 +27,6 @@ public class Cuisine {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-//  @JsonIgnore
 //  @JsonProperty("title")
 	@Column (nullable = false)
 	private String nom;
@@ -35,5 +34,4 @@ public class Cuisine {
 	@JsonIgnore
 	@OneToMany(mappedBy = "cuisine")
 	private List<Restaurant> restaurants = new ArrayList<>();
-		
 }
