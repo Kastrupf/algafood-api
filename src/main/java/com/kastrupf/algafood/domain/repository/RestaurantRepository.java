@@ -13,7 +13,7 @@ import com.kastrupf.algafood.domain.model.Restaurant;
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, RestaurantRepositoryQueries, 
 JpaSpecificationExecutor<Restaurant> {
 	
-	@Query("from Restaurant r join fetch r.cuisine left join fetch r.moyensDePayement")
+	@Query("from Restaurant r join fetch r.cuisine")
 	 List<Restaurant> findAll();
 			
 	int countByCuisineId(Long cuisine);
