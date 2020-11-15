@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kastrupf.algafood.domain.exception.EntityInUseException;
-import com.kastrupf.algafood.domain.exception.EntityNotFoundException;
 import com.kastrupf.algafood.domain.model.Cuisine;
 import com.kastrupf.algafood.domain.repository.CuisineRepository;
 import com.kastrupf.algafood.domain.service.RegistreCuisineService;
@@ -74,6 +72,12 @@ public class CuisineController {
 	}
 	
 	@DeleteMapping("/{id}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void supprimer(@PathVariable Long id) {
+		registreCuisine.supprimer(id);
+	}
+				
+/*	@DeleteMapping("/{id}")
 	public ResponseEntity<?> supprimer(@PathVariable Long id) {
 		try {
 			registreCuisine.supprimer(id);
@@ -86,5 +90,6 @@ public class CuisineController {
 			return ResponseEntity.status(HttpStatus.CONFLICT).
 					body(e.getMessage());
 		}
-	}
+	} */	
+	
 }
