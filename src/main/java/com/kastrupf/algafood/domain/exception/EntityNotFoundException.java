@@ -1,18 +1,14 @@
 package com.kastrupf.algafood.domain.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-//@ResponseStatus(value = HttpStatus.NOT_FOUND) //, reason = "Entitie non trouvée")
-public class EntityNotFoundException extends ResponseStatusException {
+@ResponseStatus(value = HttpStatus.NOT_FOUND) 
+public class EntityNotFoundException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 			
-	public EntityNotFoundException(HttpStatus status, String message) {
-		super(status, message);
-	}
-
 	public EntityNotFoundException(String message) {
-		this(HttpStatus.NOT_FOUND, message);;
+		super(message);
 	}
 }

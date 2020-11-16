@@ -13,6 +13,8 @@ import com.kastrupf.algafood.domain.repository.CuisineRepository;
 @Service
 public class RegistreCuisineService {
 	
+	private static final String MSG_CUISINE_IN_USE = "Il n'y a pas de cuisine enregistrée avec le code %d";
+	private static final String MSG_CUISINE_NON_TROUVEE = MSG_CUISINE_IN_USE;
 	@Autowired
 	private CuisineRepository cuisines;
 	
@@ -26,11 +28,17 @@ public class RegistreCuisineService {
 				
 			} catch (EmptyResultDataAccessException e) {	
 				throw new EntityNotFoundException(
-						String.format("Il n'y a pas de cuisine enregistrée avec le code %d", id));
+						String.format(MSG_CUISINE_NON_TROUVEE, id));
 				
 			} catch (DataIntegrityViolationException e) {
 				throw new EntityInUseException(
 						String.format("La cuisine code %d ne peut pas être retirée car elle est en cours d'utilisation", id));
 			}
 	}
+		
+		public Cuisine chercherOuEchouer(Long id) {
+			return cuisines.findById(id)
+					.orElseThrow(() -> new EntityNotFoundException(
+							String.format(MSG_CUISINE_NON_TROUVEE, id)));
+		}
 }
