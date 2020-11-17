@@ -9,24 +9,27 @@ import com.kastrupf.algafood.domain.exception.EntityInUseException;
 import com.kastrupf.algafood.domain.exception.EntityNotFoundException;
 import com.kastrupf.algafood.domain.model.Region;
 import com.kastrupf.algafood.domain.model.Ville;
-import com.kastrupf.algafood.domain.repository.RegionRepository;
 import com.kastrupf.algafood.domain.repository.VilleRepository;
 
 @Service
 public class RegistreVilleService {
 	
+	private static final String MSG_VILLE_IN_USE = 
+			"La ville code %d ne peut pas être retirée car elle est en cours d'utilisation";
+
+	private static final String MSG_VILLE_NON_TROUVEE = 
+			"Il n'y a pas de ville enregistrée avec le code %d";
+
 	@Autowired
 	private VilleRepository villes;
 	
 	@Autowired
-	private RegionRepository regions;
+	private RegistreRegionService registreRegion;
+	
 	
 	public Ville ajouter(Ville ville) {
         Long regionId = ville.getRegion().getId();
-        Region region = regions.findById(regionId)
-        		.orElseThrow(() -> new EntityNotFoundException(
-                String.format("Il n'y a pas de région enregistrée avec le code %d", regionId)));
-              
+        Region region = registreRegion.chercherOuEchouer(regionId);
         ville.setRegion(region);
         
         return villes.save(ville);
@@ -38,11 +41,18 @@ public class RegistreVilleService {
 				
 			} catch (EmptyResultDataAccessException e) {	
 				throw new EntityNotFoundException(
-						String.format("Il n'y a pas de ville enregistrée avec le code %d", id));
+						String.format(MSG_VILLE_NON_TROUVEE, id));
 				
 			} catch (DataIntegrityViolationException e) {
 				throw new EntityInUseException(
-						String.format("La ville code %d ne peut pas être retirée car elle est en cours d'utilisation", id));
+						String.format(MSG_VILLE_IN_USE, id));
 			}
 	}
+		
+		public Ville chercherOuEchouer(Long id) {
+		    return villes.findById(id)
+		        .orElseThrow(() -> new EntityNotFoundException(
+		                String.format(MSG_VILLE_NON_TROUVEE, id)));
+		}    
+		
 }

@@ -13,25 +13,37 @@ import com.kastrupf.algafood.domain.repository.RegionRepository;
 @Service
 public class RegistreRegionService {
 	
+	private static final String MSG_REGION_IN_USE = 
+			"La région code %d ne peut pas être retirée car elle est en cours d'utilisation";
+	
+	private static final String MSG_REGION_NON_TROUVEE = 
+			"Il n'y a pas de registre de région avec le code %d";
+	
 	@Autowired
-	private RegionRepository regionRepository;
+	private RegionRepository regions;
 	
 	public Region ajouter(Region region) {
-		return regionRepository.save(region);
+		return regions.save(region);
 	}
 	
 	public void supprimer(Long id) {
 		try {
-			regionRepository.deleteById(id);
+			regions.deleteById(id);
 			
 		} catch (EmptyResultDataAccessException e) {
 			throw new EntityNotFoundException(
-				String.format("Il n'y a pas de registre de région avec le code %d", id));
+				String.format(MSG_REGION_NON_TROUVEE, id));
 		
 		} catch (DataIntegrityViolationException e) {
 			throw new EntityInUseException(
-				String.format("La région code %d ne peut pas être retirée car elle est en cours d'utilisation", id));
+				String.format(MSG_REGION_IN_USE, id));
 		}
 	}
 	
+	public Region chercherOuEchouer(Long id) {
+	    return regions.findById(id)
+	        .orElseThrow(() -> new EntityNotFoundException(
+	                String.format(MSG_REGION_NON_TROUVEE, id)));
+	}
+
 }
