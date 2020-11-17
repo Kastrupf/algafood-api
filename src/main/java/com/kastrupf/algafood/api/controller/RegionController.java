@@ -1,12 +1,10 @@
 package com.kastrupf.algafood.api.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kastrupf.algafood.domain.exception.EntityInUseException;
-import com.kastrupf.algafood.domain.exception.EntityNotFoundException;
 import com.kastrupf.algafood.domain.model.Region;
 import com.kastrupf.algafood.domain.repository.RegionRepository;
 import com.kastrupf.algafood.domain.service.RegistreRegionService;
@@ -39,14 +35,8 @@ public class RegionController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Region> parId(@PathVariable Long id) {
-		Optional <Region> region = regionRepository.findById(id);
-		
-		if (region.isPresent()) {
-			return ResponseEntity.ok(region.get());
-		}
-		
-		return ResponseEntity.notFound().build();
+	public Region parId(@PathVariable Long id) {
+		return registreRegion.chercherOuEchouer(id);
 	}
 	
 	@PostMapping
@@ -56,33 +46,16 @@ public class RegionController {
 	}
 	    
 	@PutMapping("/{id}")
-	public ResponseEntity<Region> mettreAJour(@PathVariable Long id,
+	public Region mettreAJour(@PathVariable Long id,
 			@RequestBody Region region) {
 		Region regionActuelle = regionRepository.findById(id).orElse(null);
-			
-		if (regionActuelle != null) {
-			BeanUtils.copyProperties(region, regionActuelle, "id");
-				
-			regionActuelle = registreRegion.ajouter(regionActuelle);
-			return ResponseEntity.ok(regionActuelle);
-		}
-			
-		return ResponseEntity.notFound().build();
+		BeanUtils.copyProperties(region, regionActuelle, "id");
+						
+		return registreRegion.ajouter(regionActuelle);
 	}
- 
+	 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> supprimer(@PathVariable Long id) {
-		try {
-			registreRegion.supprimer(id);	
-			return ResponseEntity.noContent().build();
-			
-		} catch (EntityNotFoundException e) {
-			return ResponseEntity.notFound().build();
-			
-		} catch (EntityInUseException e) {
-			return ResponseEntity.status(HttpStatus.CONFLICT)
-					.body(e.getMessage());
-		}
+	public void supprimer(@PathVariable Long id) {
+		registreRegion.supprimer(id);	
 	}
-
 }
