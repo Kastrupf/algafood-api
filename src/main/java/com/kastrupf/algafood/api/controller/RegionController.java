@@ -48,7 +48,7 @@ public class RegionController {
 	@PutMapping("/{id}")
 	public Region mettreAJour(@PathVariable Long id,
 			@RequestBody Region region) {
-		Region regionActuelle = regionRepository.findById(id).orElse(null);
+		Region regionActuelle = registreRegion.chercherOuEchouer(id);
 		BeanUtils.copyProperties(region, regionActuelle, "id");
 						
 		return registreRegion.ajouter(regionActuelle);

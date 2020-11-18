@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kastrupf.algafood.domain.exception.EntiteNonTrouveeException;
+import com.kastrupf.algafood.domain.exception.CuisineNonTrouveeException;
 import com.kastrupf.algafood.domain.exception.GeneriqueException;
 import com.kastrupf.algafood.domain.model.Restaurant;
 import com.kastrupf.algafood.domain.repository.RestaurantRepository;
@@ -51,7 +51,7 @@ public class RestaurantController {
 	   
 		try {
 			return registreRestaurant.ajouter(restaurant);
-		} catch (EntiteNonTrouveeException e) {
+		} catch (CuisineNonTrouveeException e) {
 			throw new GeneriqueException(e.getMessage());
 		}
 	}
@@ -66,7 +66,7 @@ public class RestaurantController {
 	  	    
 	    try {
 	    	return registreRestaurant.ajouter(restaurantActuel);
-		} catch (EntiteNonTrouveeException e) {
+		} catch (CuisineNonTrouveeException e) {
 			throw new GeneriqueException(e.getMessage());
 		}
 	}
