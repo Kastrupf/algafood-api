@@ -45,7 +45,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
 		
-/* Si je reçois un body nul, le message d'état est par défaut, sinon, je retourne un body avec une String dans le message d'erreur */		
+/* Si je reçois un body nul, le message d'état est par défaut, 
+ * sinon, je retourne un body avec une String dans le message d'erreur */		
 		if (body == null) {
 			body = Erreur.builder()
 				.dateHeure(LocalDateTime.now())

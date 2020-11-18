@@ -13,7 +13,9 @@ import com.kastrupf.algafood.domain.model.Restaurant;
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, RestaurantRepositoryQueries, 
 JpaSpecificationExecutor<Restaurant> {
 	
-	@Query("from Restaurant r join fetch r.cuisine")
+	/* si un restaurant n'a aucun moyen de paiement associé, ce restaurant ne sera pas retourné en utilisant 
+	 * JOIN FETCH r.formasPagamento. Pour résoudre ce problème, nous devons utiliser LEFT JOIN FETCH r.formasPayment*/
+	@Query("from Restaurant r join fetch r.cuisine left join fetch r.moyensDePayement")
 	 List<Restaurant> findAll();
 			
 	int countByCuisineId(Long cuisine);
