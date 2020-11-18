@@ -8,6 +8,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
 import com.kastrupf.algafood.domain.exception.EntiteNonTrouveeException;
 import com.kastrupf.algafood.domain.exception.GeneriqueException;
 
@@ -15,8 +16,19 @@ import com.kastrupf.algafood.domain.exception.GeneriqueException;
 @ControllerAdvice
 public class ApiExceptionHandler {
 	
+	@ExceptionHandler(EntiteEnCoursUtilisationException.class)
+	public ResponseEntity<?> traiterEntiteEnCoursUtilisationException(
+			EntiteNonTrouveeException e) {
+		Erreur erreur = Erreur.builder()
+				.dateHeure(LocalDateTime.now())
+				.message(e.getMessage()).build();
+		
+		return ResponseEntity.status(HttpStatus.CONFLICT)
+				.body(erreur);
+	}
+		
 	@ExceptionHandler(EntiteNonTrouveeException.class)
-	public ResponseEntity<?> tratarEntidadeNaoEncontradaException(
+	public ResponseEntity<?> traiterEntiteNonTrouveeException(
 			EntiteNonTrouveeException e) {
 		Erreur erreur = Erreur.builder()
 				.dateHeure(LocalDateTime.now())
@@ -27,7 +39,7 @@ public class ApiExceptionHandler {
 	}
 	
 	@ExceptionHandler(GeneriqueException.class)
-	public ResponseEntity<?> tratarNegocioException(GeneriqueException e) {
+	public ResponseEntity<?> traiterGeneriqueException(GeneriqueException e) {
 		Erreur erreur = Erreur.builder()
 				.dateHeure(LocalDateTime.now())
 				.message(e.getMessage()).build();
