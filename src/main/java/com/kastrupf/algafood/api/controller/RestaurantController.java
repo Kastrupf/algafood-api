@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kastrupf.algafood.domain.exception.EntityNotFoundException;
+import com.kastrupf.algafood.domain.exception.GenericException;
 import com.kastrupf.algafood.domain.model.Restaurant;
 import com.kastrupf.algafood.domain.repository.RestaurantRepository;
 import com.kastrupf.algafood.domain.service.RegistreRestaurantService;
@@ -46,18 +48,28 @@ public class RestaurantController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public Restaurant ajouter(@RequestBody Restaurant restaurant) {
-	    return registreRestaurant.ajouter(restaurant);
+	   
+		try {
+			return registreRestaurant.ajouter(restaurant);
+		} catch (EntityNotFoundException e) {
+			throw new GenericException(e.getMessage());
+		}
+	    
 	}
 
 	@PutMapping("/{id}")
 	public Restaurant mettreAJour(@PathVariable Long id,
 	        @RequestBody Restaurant restaurant) {
 	    Restaurant restaurantActuel = registreRestaurant.chercherOuEchouer(id);
-	    
+	    	    
 	    BeanUtils.copyProperties(restaurant, restaurantActuel, 
 	            "id", "moyensDePayement", "adresse", "dateRegistre", "produits");
-	    
-	    return registreRestaurant.ajouter(restaurantActuel);
+	  	    
+	    try {
+	    	return registreRestaurant.ajouter(restaurantActuel);
+		} catch (EntityNotFoundException e) {
+			throw new GenericException(e.getMessage());
+		}
 	}
 	
 	@PatchMapping("/{id}")
