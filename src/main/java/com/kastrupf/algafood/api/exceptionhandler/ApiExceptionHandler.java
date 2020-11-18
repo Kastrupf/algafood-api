@@ -2,11 +2,13 @@ package com.kastrupf.algafood.api.exceptionhandler;
 
 import java.time.LocalDateTime;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
 import com.kastrupf.algafood.domain.exception.EntiteNonTrouveeException;
@@ -14,49 +16,51 @@ import com.kastrupf.algafood.domain.exception.GeneriqueException;
 
 
 @ControllerAdvice
-public class ApiExceptionHandler {
+public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	
 	@ExceptionHandler(EntiteEnCoursUtilisationException.class)
 	public ResponseEntity<?> traiterEntiteEnCoursUtilisationException(
-			EntiteNonTrouveeException e) {
-		Erreur erreur = Erreur.builder()
-				.dateHeure(LocalDateTime.now())
-				.message(e.getMessage()).build();
+			EntiteNonTrouveeException ex, WebRequest request) {
 		
-		return ResponseEntity.status(HttpStatus.CONFLICT)
-				.body(erreur);
+		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
+				HttpStatus.CONFLICT, request);
 	}
 		
 	@ExceptionHandler(EntiteNonTrouveeException.class)
 	public ResponseEntity<?> traiterEntiteNonTrouveeException(
-			EntiteNonTrouveeException e) {
-		Erreur erreur = Erreur.builder()
-				.dateHeure(LocalDateTime.now())
-				.message(e.getMessage()).build();
+			EntiteNonTrouveeException ex, WebRequest request) {
 		
-		return ResponseEntity.status(HttpStatus.NOT_FOUND)
-				.body(erreur);
+		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
+				HttpStatus.NOT_FOUND, request);
 	}
 	
 	@ExceptionHandler(GeneriqueException.class)
-	public ResponseEntity<?> traiterGeneriqueException(GeneriqueException e) {
-		Erreur erreur = Erreur.builder()
-				.dateHeure(LocalDateTime.now())
-				.message(e.getMessage()).build();
+	public ResponseEntity<?> traiterGeneriqueException(GeneriqueException ex, WebRequest request) {
 		
-		return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-				.body(erreur);
+		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
+				HttpStatus.BAD_REQUEST, request);
 	}
 	
-	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-	public ResponseEntity<?> traiterHttpMediaTypeNotSupportedException() {
-		Erreur erreur = Erreur.builder()
-				.dateHeure(LocalDateTime.now())
-				.message("Le type de support n'est pas pris en charge.").build();
+	@Override
+	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
+			HttpStatus status, WebRequest request) {
 		
-		return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-				.body(erreur);
+/* Si je reçois un body nul, le message d'état est par défaut, sinon, je retourne un body avec une String dans le message d'erreur */		
+		if (body == null) {
+			body = Erreur.builder()
+				.dateHeure(LocalDateTime.now())
+				.message(status.getReasonPhrase())
+				.build();						
+			} else if (body instanceof String) {
+				body = Erreur.builder()
+						.dateHeure(LocalDateTime.now())
+						.message((String) body)
+						.build();		
+			}
+						
+		return super.handleExceptionInternal(ex, body, headers, status, request);
 	}
+	
 	
 }
 
