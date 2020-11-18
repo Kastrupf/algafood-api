@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.kastrupf.algafood.domain.exception.EntityNotFoundException;
-import com.kastrupf.algafood.domain.exception.GenericException;
+import com.kastrupf.algafood.domain.exception.EntiteNonTrouveeException;
+import com.kastrupf.algafood.domain.exception.GeneriqueException;
 import com.kastrupf.algafood.domain.model.Ville;
 import com.kastrupf.algafood.domain.repository.VilleRepository;
 import com.kastrupf.algafood.domain.service.RegistreVilleService;
@@ -26,14 +26,14 @@ import com.kastrupf.algafood.domain.service.RegistreVilleService;
 public class VilleController {
 	
 	@Autowired
-	private VilleRepository villeRepository;
+	private VilleRepository villes;
 	
 	@Autowired
 	private RegistreVilleService registreVille;
 	
 	@GetMapping
 	public List<Ville> lister() {
-		return villeRepository.findAll();
+		return villes.findAll();
 	}
 				
 	@GetMapping("/{id}")
@@ -47,21 +47,22 @@ public class VilleController {
 	
 		try {
 			return registreVille.ajouter(ville);
-		} catch (EntityNotFoundException e) {
-			throw new GenericException(e.getMessage());
+		} catch (EntiteNonTrouveeException e) {
+			throw new GeneriqueException(e.getMessage());
 		}
 	}
 			
 	@PutMapping("/{id}")
 	public Ville mettreAJour(@PathVariable Long id,
 			@RequestBody Ville ville) {
-		Ville villeActuelle = villeRepository.findById(id).orElse(null);
-		BeanUtils.copyProperties(ville, villeActuelle, "id");
 		
 		try {
+			Ville villeActuelle = registreVille.chercherOuEchouer(id);
+			BeanUtils.copyProperties(ville, villeActuelle, "id");
+			
 			return registreVille.ajouter(villeActuelle);
-		} catch (EntityNotFoundException e) {
-			throw new GenericException(e.getMessage());
+		} catch (EntiteNonTrouveeException e) {
+			throw new GeneriqueException(e.getMessage());
 		}
 	}
 	

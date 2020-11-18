@@ -5,19 +5,16 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.kastrupf.algafood.domain.exception.EntityInUseException;
-import com.kastrupf.algafood.domain.exception.EntityNotFoundException;
+import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
+import com.kastrupf.algafood.domain.exception.RegionNonTrouveeException;
 import com.kastrupf.algafood.domain.model.Region;
 import com.kastrupf.algafood.domain.repository.RegionRepository;
 
 @Service
 public class RegistreRegionService {
 	
-	private static final String MSG_REGION_IN_USE = 
-			"La région code %d ne peut pas être retirée car elle est en cours d'utilisation";
-	
-	private static final String MSG_REGION_NON_TROUVEE = 
-			"Il n'y a pas de registre de région avec le code %d";
+	private static final String MSG_REGION_IN_USE 
+		= "La région avec le code %d ne peut pas être supprimée, car elle est en cours d'utilisation";
 	
 	@Autowired
 	private RegionRepository regions;
@@ -31,19 +28,16 @@ public class RegistreRegionService {
 			regions.deleteById(id);
 			
 		} catch (EmptyResultDataAccessException e) {
-			throw new EntityNotFoundException(
-				String.format(MSG_REGION_NON_TROUVEE, id));
+			throw new RegionNonTrouveeException(id);
 		
 		} catch (DataIntegrityViolationException e) {
-			throw new EntityInUseException(
+			throw new EntiteEnCoursUtilisationException(
 				String.format(MSG_REGION_IN_USE, id));
 		}
 	}
 	
 	public Region chercherOuEchouer(Long id) {
 	    return regions.findById(id)
-	        .orElseThrow(() -> new EntityNotFoundException(
-	                String.format(MSG_REGION_NON_TROUVEE, id)));
+	        .orElseThrow(() -> new RegionNonTrouveeException(id));
 	}
-
 }

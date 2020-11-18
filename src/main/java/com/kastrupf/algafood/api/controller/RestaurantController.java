@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kastrupf.algafood.domain.exception.EntityNotFoundException;
-import com.kastrupf.algafood.domain.exception.GenericException;
+import com.kastrupf.algafood.domain.exception.EntiteNonTrouveeException;
+import com.kastrupf.algafood.domain.exception.GeneriqueException;
 import com.kastrupf.algafood.domain.model.Restaurant;
 import com.kastrupf.algafood.domain.repository.RestaurantRepository;
 import com.kastrupf.algafood.domain.service.RegistreRestaurantService;
@@ -30,14 +30,14 @@ import com.kastrupf.algafood.domain.service.RegistreRestaurantService;
 public class RestaurantController {
 
 	@Autowired
-	private RestaurantRepository restaurantRepository;
+	private RestaurantRepository restaurants;
 	
 	@Autowired
 	private RegistreRestaurantService registreRestaurant;
 	
 	@GetMapping
 	public List<Restaurant> lister() {
-		return restaurantRepository.findAll();
+		return restaurants.findAll();
 	}
 	
 	@GetMapping("/{id}")
@@ -51,10 +51,9 @@ public class RestaurantController {
 	   
 		try {
 			return registreRestaurant.ajouter(restaurant);
-		} catch (EntityNotFoundException e) {
-			throw new GenericException(e.getMessage());
+		} catch (EntiteNonTrouveeException e) {
+			throw new GeneriqueException(e.getMessage());
 		}
-	    
 	}
 
 	@PutMapping("/{id}")
@@ -67,8 +66,8 @@ public class RestaurantController {
 	  	    
 	    try {
 	    	return registreRestaurant.ajouter(restaurantActuel);
-		} catch (EntityNotFoundException e) {
-			throw new GenericException(e.getMessage());
+		} catch (EntiteNonTrouveeException e) {
+			throw new GeneriqueException(e.getMessage());
 		}
 	}
 	
@@ -91,8 +90,6 @@ public class RestaurantController {
 			field.setAccessible(true);
 			
 			Object nouveauValeur = ReflectionUtils.getField(field, restaurantOrigen);
-			
-//			System.out.println(nomePropriete + " = " + valeurPropriete + " = " + nouveauValeur);
 			
 			ReflectionUtils.setField(field, restaurantDestin, nouveauValeur);
 		});

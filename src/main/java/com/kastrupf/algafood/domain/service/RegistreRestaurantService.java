@@ -3,7 +3,7 @@ package com.kastrupf.algafood.domain.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.kastrupf.algafood.domain.exception.EntityNotFoundException;
+import com.kastrupf.algafood.domain.exception.EntiteNonTrouveeException;
 import com.kastrupf.algafood.domain.model.Cuisine;
 import com.kastrupf.algafood.domain.model.Restaurant;
 import com.kastrupf.algafood.domain.repository.RestaurantRepository;
@@ -12,7 +12,7 @@ import com.kastrupf.algafood.domain.repository.RestaurantRepository;
 public class RegistreRestaurantService {
 	
 	private static final String MSG_RESTAURANT_NON_TROUVÉ = 
-			"Le restaurant code %d n'a pas été trouvé";
+			"Le restaurant de code %d n'a pas été trouvé";
 
 	@Autowired
 	private RestaurantRepository restaurants;
@@ -30,7 +30,7 @@ public class RegistreRestaurantService {
 		
 		public Restaurant chercherOuEchouer(Long id) {
 		    return restaurants.findById(id)
-		        .orElseThrow(() -> new EntityNotFoundException(
+		        .orElseThrow(() -> new EntiteNonTrouveeException(
 		                String.format(MSG_RESTAURANT_NON_TROUVÉ, id)));
 		}
 }

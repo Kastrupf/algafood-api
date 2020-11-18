@@ -24,14 +24,14 @@ import com.kastrupf.algafood.domain.service.RegistreCuisineService;
 public class CuisineController {
 	
 	@Autowired
-	private CuisineRepository cuisineRepository;
+	private CuisineRepository cuisines;
 	
 	@Autowired
 	private RegistreCuisineService registreCuisine;
 	
 	@GetMapping
 	public List<Cuisine> lister() {
-		return cuisineRepository.findAll();
+		return cuisines.findAll();
 	}
 				
 	@GetMapping("/{id}")

@@ -5,8 +5,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import com.kastrupf.algafood.domain.exception.EntityInUseException;
-import com.kastrupf.algafood.domain.exception.EntityNotFoundException;
+import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
+import com.kastrupf.algafood.domain.exception.EntiteNonTrouveeException;
 import com.kastrupf.algafood.domain.model.Cuisine;
 import com.kastrupf.algafood.domain.repository.CuisineRepository;
 
@@ -27,18 +27,18 @@ public class RegistreCuisineService {
 				cuisines.deleteById(id);
 				
 			} catch (EmptyResultDataAccessException e) {	
-				throw new EntityNotFoundException(
+				throw new EntiteNonTrouveeException(
 						String.format(MSG_CUISINE_NON_TROUVEE, id));
 				
 			} catch (DataIntegrityViolationException e) {
-				throw new EntityInUseException(
-						String.format("La cuisine code %d ne peut pas être retirée car elle est en cours d'utilisation", id));
+				throw new EntiteEnCoursUtilisationException(
+						String.format("La cuisine de code %d ne peut pas être supprimée, car elle est en cours d'utilisation", id));
 			}
 	}
 		
 		public Cuisine chercherOuEchouer(Long id) {
 			return cuisines.findById(id)
-					.orElseThrow(() -> new EntityNotFoundException(
+					.orElseThrow(() -> new EntiteNonTrouveeException(
 							String.format(MSG_CUISINE_NON_TROUVEE, id)));
 		}
 }
