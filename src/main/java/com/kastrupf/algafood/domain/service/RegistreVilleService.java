@@ -30,6 +30,7 @@ public class RegistreVilleService {
 	public Ville ajouter(Ville ville) {
         Long regionId = ville.getRegion().getId();
         Region region = registreRegion.chercherOuEchouer(regionId);
+        
         ville.setRegion(region);
         
         return villes.save(ville);
