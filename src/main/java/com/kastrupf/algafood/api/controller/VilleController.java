@@ -71,5 +71,5 @@ public class VilleController {
 	public void remover(@PathVariable Long id) {
 	    registreVille.supprimer(id);	
 	}
-
+	
 }
