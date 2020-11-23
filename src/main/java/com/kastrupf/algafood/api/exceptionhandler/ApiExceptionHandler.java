@@ -1,5 +1,6 @@
 package com.kastrupf.algafood.api.exceptionhandler;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -15,7 +16,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
 import com.kastrupf.algafood.domain.exception.EntiteNonTrouveeException;
 import com.kastrupf.algafood.domain.exception.GeneriqueException;
+import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
@@ -27,7 +30,9 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		if (rootCause instanceof InvalidFormatException) {
 			return handleInvalidFormatException((InvalidFormatException) rootCause, headers, status, request);
-		}
+		} else if (rootCause instanceof PropertyBindingException) {
+	        return handlePropertyBindingException((PropertyBindingException) rootCause, headers, status, request); 
+	    }
 		
 		ProblemType problemType = ProblemType.MESSAGE_INCOMPREHENSIBLE;
 		String detail = "Le corps de la demande n'est pas valide. Vérifiez l'erreur de syntaxe.";
@@ -40,13 +45,11 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	private ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-		String path = ex.getPath().stream()
-				.map(ref -> ref.getFieldName())
-				.collect(Collectors.joining("."));
+		String path = joinPath(ex.getPath());
 		
 		ProblemType problemType = ProblemType.MESSAGE_INCOMPREHENSIBLE;
-		String detail = String.format("La propriété '%s' a reçu la valeur '%s', "
-				+ "qui est un type non valide. Veuillez corriger et entrer une valeur compatible avec le type %s.",
+		String detail = String.format("On dit que la propriété '%s' est '%s', \"\r\n"
+				+ "+ \"c'est un type non valide. Veuillez corriger et entrez une vallée compatible avec le type %s.",
 				path, ex.getValue(), ex.getTargetType().getSimpleName());
 		
 		Problem problem = createProblemBuilder(status, problemType, detail).build();
@@ -120,5 +123,33 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			.title(problemType.getTitle())
 			.detail(detail);
 	}
+	
+	private ResponseEntity<Object> handlePropertyBindingException(PropertyBindingException ex,
+	        HttpHeaders headers, HttpStatus status, WebRequest request) {
+
+	    // Criei o método joinPath para reaproveitar em todos os métodos que precisam
+	    // concatenar os nomes das propriedades (separando por ".")
+	    String path = joinPath(ex.getPath());
+	    
+	    ProblemType problemType = ProblemType.MESSAGE_INCOMPREHENSIBLE;
+	    String detail = String.format("A propriedade '%s' não existe. "
+	            + "Corrija ou remova essa propriedade e tente novamente.", path);
+
+	    Problem problem = createProblemBuilder(status, problemType, detail).build();
+	    
+	    return handleExceptionInternal(ex, problem, headers, status, request);
+	}        
+	
+	private String joinPath(List<Reference> references) {
+	    return references.stream()
+	        .map(ref -> ref.getFieldName())
+	        .collect(Collectors.joining("."));
+	} 
+	
+	
+	
+	
+	
+	
 	
 }
