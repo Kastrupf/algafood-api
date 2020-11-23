@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ErreurType {
 	
+	MESSAGE_INCOMPREHENSIBLE("/message incompréhensible", "Message incompréhensible"),
 	ENTITE_NON_TROUVEE("/entite-non-trouvee", "Entite non trouvee"),
 	ENTITE_EN_COURS_UTILISATION("/entite-en-cours-utilisation", "Entite en cours d'utlisation"),
 	ERREUR_GENERIQUE("/erreur-generique", "Violation de règle métier"); 

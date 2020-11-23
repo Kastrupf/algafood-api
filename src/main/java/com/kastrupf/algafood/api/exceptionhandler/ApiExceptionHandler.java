@@ -3,6 +3,7 @@ package com.kastrupf.algafood.api.exceptionhandler;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -15,6 +16,20 @@ import com.kastrupf.algafood.domain.exception.GeneriqueException;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
+	
+
+	@Override
+	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
+			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		
+		ErreurType erreurType = ErreurType.MESSAGE_INCOMPREHENSIBLE;
+		String detail = "Le corps de la demande n'est pas valide. Vérifier l'erreur de syntaxe.";
+		
+		Erreur erreur = createErreurBuilder(status, erreurType, detail).build();
+		
+		return handleExceptionInternal(ex, erreur, new HttpHeaders(), status, request);
+	}
+	
 	
 	@ExceptionHandler(EntiteNonTrouveeException.class)
 	public ResponseEntity<?> handleEntidadeNaoEncontradaException(
