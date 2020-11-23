@@ -30,17 +30,28 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	@ExceptionHandler(EntiteEnCoursUtilisationException.class)
-	public ResponseEntity<?> handleEntidadeEmUsoException(
+	public ResponseEntity<?> handleEntiteEnCoursUtilisationException(
 			EntiteEnCoursUtilisationException ex, WebRequest request) {
-		
-		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
-				HttpStatus.CONFLICT, request);
+	    
+	    HttpStatus status = HttpStatus.CONFLICT;
+	    ErreurType erreurType = ErreurType.ENTITE_EN_COURS_UTILISATION;
+	    String detail = ex.getMessage();
+	    
+	    Erreur erreur = createErreurBuilder(status, erreurType, detail).build();
+	    
+	    return handleExceptionInternal(ex, erreur, new HttpHeaders(), status, request);
 	}
 	
 	@ExceptionHandler(GeneriqueException.class)
 	public ResponseEntity<?> handleNegocioException(GeneriqueException ex, WebRequest request) {
-		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
-				HttpStatus.BAD_REQUEST, request);
+		
+		HttpStatus status = HttpStatus.BAD_REQUEST;
+		ErreurType erreurType = ErreurType.ERREUR_GENERIQUE;
+	    String detail = ex.getMessage();
+	    
+	    Erreur erreur = createErreurBuilder(status, erreurType, detail).build();
+						
+	    return handleExceptionInternal(ex, erreur, new HttpHeaders(), status, request);
 	}
 	
 	@Override
