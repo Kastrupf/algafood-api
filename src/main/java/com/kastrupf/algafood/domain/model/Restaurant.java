@@ -61,7 +61,7 @@ public class Restaurant {
 	@Column (name = "date_mise_a_jour", nullable = false)
 	private LocalDateTime dateMiseAJour;
 		
-	@JsonIgnore
+//	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "restaurant_moyen_de_payment", 
 			joinColumns = @JoinColumn(name = "restaurant_id"),

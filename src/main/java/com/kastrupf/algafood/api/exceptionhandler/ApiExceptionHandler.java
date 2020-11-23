@@ -1,7 +1,5 @@
 package com.kastrupf.algafood.api.exceptionhandler;
 
-import java.time.LocalDateTime;
-
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,25 +16,29 @@ import com.kastrupf.algafood.domain.exception.GeneriqueException;
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	
-	@ExceptionHandler(EntiteEnCoursUtilisationException.class)
-	public ResponseEntity<?> traiterEntiteEnCoursUtilisationException(
+	@ExceptionHandler(EntiteNonTrouveeException.class)
+	public ResponseEntity<?> handleEntidadeNaoEncontradaException(
 			EntiteNonTrouveeException ex, WebRequest request) {
+		
+		HttpStatus status = HttpStatus.NOT_FOUND;
+		ErreurType erreurType = ErreurType.ENTITE_NON_TROUVEE;
+		String detail = ex.getMessage();
+		
+		Erreur erreur = createErreurBuilder(status, erreurType, detail).build();
+		
+		return handleExceptionInternal(ex, erreur, new HttpHeaders(), status, request);
+	}
+	
+	@ExceptionHandler(EntiteEnCoursUtilisationException.class)
+	public ResponseEntity<?> handleEntidadeEmUsoException(
+			EntiteEnCoursUtilisationException ex, WebRequest request) {
 		
 		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
 				HttpStatus.CONFLICT, request);
 	}
-		
-	@ExceptionHandler(EntiteNonTrouveeException.class)
-	public ResponseEntity<?> traiterEntiteNonTrouveeException(
-			EntiteNonTrouveeException ex, WebRequest request) {
-		
-		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
-				HttpStatus.NOT_FOUND, request);
-	}
 	
 	@ExceptionHandler(GeneriqueException.class)
-	public ResponseEntity<?> traiterGeneriqueException(GeneriqueException ex, WebRequest request) {
-		
+	public ResponseEntity<?> handleNegocioException(GeneriqueException ex, WebRequest request) {
 		return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), 
 				HttpStatus.BAD_REQUEST, request);
 	}
@@ -45,23 +47,28 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
 		
-/* Si je reçois un body nul, le message d'état est par défaut, 
- * sinon, je retourne un body avec une String dans le message d'erreur */		
 		if (body == null) {
 			body = Erreur.builder()
-				.dateHeure(LocalDateTime.now())
-				.message(status.getReasonPhrase())
-				.build();						
-			} else if (body instanceof String) {
-				body = Erreur.builder()
-						.dateHeure(LocalDateTime.now())
-						.message((String) body)
-						.build();		
-			}
-						
+				.title(status.getReasonPhrase())
+				.status(status.value())
+				.build();
+		} else if (body instanceof String) {
+			body = Erreur.builder()
+				.title((String) body)
+				.status(status.value())
+				.build();
+		}
+		
 		return super.handleExceptionInternal(ex, body, headers, status, request);
 	}
 	
-	
+	private Erreur.ErreurBuilder createErreurBuilder(HttpStatus status,
+			ErreurType erreurType, String detail) {
+		
+		return Erreur.builder()
+			.status(status.value())
+			.type(erreurType.getUri())
+			.title(erreurType.getTitle())
+			.detail(detail);
+	}
 }
-
