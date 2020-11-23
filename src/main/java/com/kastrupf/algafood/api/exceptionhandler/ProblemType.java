@@ -3,7 +3,7 @@ package com.kastrupf.algafood.api.exceptionhandler;
 import lombok.Getter;
 
 @Getter
-public enum ErreurType {
+public enum ProblemType {
 	
 	MESSAGE_INCOMPREHENSIBLE("/message incompréhensible", "Message incompréhensible"),
 	ENTITE_NON_TROUVEE("/entite-non-trouvee", "Entite non trouvee"),
@@ -13,7 +13,7 @@ public enum ErreurType {
 	private String title;
 	private String uri;	
 	
-	ErreurType(String path, String title) {
+	ProblemType(String path, String title) {
 		this.uri = "https://algafood.com.br" + path;
 		this.title = title;
 	}

@@ -9,7 +9,7 @@ import lombok.Getter;
 @JsonInclude(Include.NON_NULL)
 @Getter
 @Builder
-public class Erreur {
+public class Problem {
 	
 	private Integer status;
 	private String type;

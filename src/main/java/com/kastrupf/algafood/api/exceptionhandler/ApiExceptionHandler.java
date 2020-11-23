@@ -1,5 +1,8 @@
 package com.kastrupf.algafood.api.exceptionhandler;
 
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,61 +15,81 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
 import com.kastrupf.algafood.domain.exception.EntiteNonTrouveeException;
 import com.kastrupf.algafood.domain.exception.GeneriqueException;
-
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
-	
 
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		Throwable rootCause = ExceptionUtils.getRootCause(ex);
 		
-		ErreurType erreurType = ErreurType.MESSAGE_INCOMPREHENSIBLE;
-		String detail = "Le corps de la demande n'est pas valide. Vérifier l'erreur de syntaxe.";
+		if (rootCause instanceof InvalidFormatException) {
+			return handleInvalidFormatException((InvalidFormatException) rootCause, headers, status, request);
+		}
 		
-		Erreur erreur = createErreurBuilder(status, erreurType, detail).build();
+		ProblemType problemType = ProblemType.MESSAGE_INCOMPREHENSIBLE;
+		String detail = "Le corps de la demande n'est pas valide. Vérifiez l'erreur de syntaxe.";
 		
-		return handleExceptionInternal(ex, erreur, new HttpHeaders(), status, request);
+		Problem problem = createProblemBuilder(status, problemType, detail).build();
+		
+		return handleExceptionInternal(ex, problem, headers, status, request);
 	}
 	
-	
+	private ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex,
+			HttpHeaders headers, HttpStatus status, WebRequest request) {
+
+		String path = ex.getPath().stream()
+				.map(ref -> ref.getFieldName())
+				.collect(Collectors.joining("."));
+		
+		ProblemType problemType = ProblemType.MESSAGE_INCOMPREHENSIBLE;
+		String detail = String.format("La propriété '%s' a reçu la valeur '%s', "
+				+ "qui est un type non valide. Veuillez corriger et entrer une valeur compatible avec le type %s.",
+				path, ex.getValue(), ex.getTargetType().getSimpleName());
+		
+		Problem problem = createProblemBuilder(status, problemType, detail).build();
+		
+		return handleExceptionInternal(ex, problem, headers, status, request);
+	}
+
 	@ExceptionHandler(EntiteNonTrouveeException.class)
 	public ResponseEntity<?> handleEntidadeNaoEncontradaException(
 			EntiteNonTrouveeException ex, WebRequest request) {
 		
 		HttpStatus status = HttpStatus.NOT_FOUND;
-		ErreurType erreurType = ErreurType.ENTITE_NON_TROUVEE;
+		ProblemType problemType = ProblemType.ENTITE_NON_TROUVEE;
 		String detail = ex.getMessage();
 		
-		Erreur erreur = createErreurBuilder(status, erreurType, detail).build();
+		Problem problem = createProblemBuilder(status, problemType, detail).build();
 		
-		return handleExceptionInternal(ex, erreur, new HttpHeaders(), status, request);
+		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
 	}
 	
 	@ExceptionHandler(EntiteEnCoursUtilisationException.class)
-	public ResponseEntity<?> handleEntiteEnCoursUtilisationException(
+	public ResponseEntity<?> handleEntidadeEmUsoException(
 			EntiteEnCoursUtilisationException ex, WebRequest request) {
-	    
-	    HttpStatus status = HttpStatus.CONFLICT;
-	    ErreurType erreurType = ErreurType.ENTITE_EN_COURS_UTILISATION;
-	    String detail = ex.getMessage();
-	    
-	    Erreur erreur = createErreurBuilder(status, erreurType, detail).build();
-	    
-	    return handleExceptionInternal(ex, erreur, new HttpHeaders(), status, request);
+		
+		HttpStatus status = HttpStatus.CONFLICT;
+		ProblemType problemType = ProblemType.ENTITE_EN_COURS_UTILISATION;
+		String detail = ex.getMessage();
+		
+		Problem problem = createProblemBuilder(status, problemType, detail).build();
+		
+		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
 	}
 	
 	@ExceptionHandler(GeneriqueException.class)
 	public ResponseEntity<?> handleNegocioException(GeneriqueException ex, WebRequest request) {
-		
+
 		HttpStatus status = HttpStatus.BAD_REQUEST;
-		ErreurType erreurType = ErreurType.ERREUR_GENERIQUE;
-	    String detail = ex.getMessage();
-	    
-	    Erreur erreur = createErreurBuilder(status, erreurType, detail).build();
-						
-	    return handleExceptionInternal(ex, erreur, new HttpHeaders(), status, request);
+		ProblemType problemType = ProblemType.ERREUR_GENERIQUE;
+		String detail = ex.getMessage();
+		
+		Problem problem = createProblemBuilder(status, problemType, detail).build();
+		
+		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
 	}
 	
 	@Override
@@ -74,12 +97,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			HttpStatus status, WebRequest request) {
 		
 		if (body == null) {
-			body = Erreur.builder()
+			body = Problem.builder()
 				.title(status.getReasonPhrase())
 				.status(status.value())
 				.build();
 		} else if (body instanceof String) {
-			body = Erreur.builder()
+			body = Problem.builder()
 				.title((String) body)
 				.status(status.value())
 				.build();
@@ -88,13 +111,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		return super.handleExceptionInternal(ex, body, headers, status, request);
 	}
 	
-	private Erreur.ErreurBuilder createErreurBuilder(HttpStatus status,
-			ErreurType erreurType, String detail) {
+	private Problem.ProblemBuilder createProblemBuilder(HttpStatus status,
+			ProblemType problemType, String detail) {
 		
-		return Erreur.builder()
+		return Problem.builder()
 			.status(status.value())
-			.type(erreurType.getUri())
-			.title(erreurType.getTitle())
+			.type(problemType.getUri())
+			.title(problemType.getTitle())
 			.detail(detail);
 	}
+	
 }
