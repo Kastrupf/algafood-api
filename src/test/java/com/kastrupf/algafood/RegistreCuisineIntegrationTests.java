@@ -2,12 +2,16 @@ package com.kastrupf.algafood;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import javax.validation.ConstraintViolationException;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.kastrupf.algafood.domain.exception.CuisineNonTrouveeException;
+import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
 import com.kastrupf.algafood.domain.model.Cuisine;
 import com.kastrupf.algafood.domain.service.RegistreCuisineService;
 
@@ -18,8 +22,18 @@ public class RegistreCuisineIntegrationTests {
 	@Autowired
 	private RegistreCuisineService registreCuisine;
 	
+	@Test(expected = EntiteEnCoursUtilisationException.class)
+	public void neDoitPasSupprimerLaCuisine_QuandElleEstEnCoursDutilisation() {
+	    registreCuisine.supprimer(1L);
+	}
+	
+	@Test(expected = CuisineNonTrouveeException.class)
+	public void neDoitPasSupprimerLaCuisine_QuandElleEstInexistente() {
+		registreCuisine.supprimer(100L);
+	}    
+	  	
 	@Test
-	public void testerAjouterCuisineAvecSucces() {
+	public void doitAjouterCuisine_QuandUnNomLuiEstAttibué() {
 		// scenario
 		Cuisine nouvelleCuisine = new Cuisine();
 		nouvelleCuisine.setNom("Chinoise");
@@ -33,11 +47,11 @@ public class RegistreCuisineIntegrationTests {
 	}
 	
 //	@Test(expected = ConstraintViolationException.class)
-//	public void testerRegistreCuisineSansNom() {
+//	public void neDoitPasAjouterCuisine_QuandLeNomNestPasAttribué() {
 //		Cuisine nouvelleCuisine = new Cuisine();
 //		nouvelleCuisine.setNom(null);
 		
 //		nouvelleCuisine = registreCuisine.ajouter(nouvelleCuisine);
 //	}
-
 }
+
