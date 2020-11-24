@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.BeanUtils;
@@ -53,7 +54,7 @@ public class RestaurantController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Restaurant ajouter(@RequestBody Restaurant restaurant) {
+	public Restaurant ajouter(@RequestBody @Valid Restaurant restaurant) {
 	   
 		try {
 			return registreRestaurant.ajouter(restaurant);
