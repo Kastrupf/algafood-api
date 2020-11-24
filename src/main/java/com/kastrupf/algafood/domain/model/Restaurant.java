@@ -42,7 +42,7 @@ public class Restaurant {
 	@Column (name="frais_transport", nullable = false)
 	private BigDecimal fraisTransport;
 	
-//	@JsonIgnore
+	@JsonIgnore
 	@ManyToOne //(fetch = FetchType.LAZY)
 	@JoinColumn(name = "cuisine_id", nullable = false)
 	private Cuisine cuisine;
@@ -61,7 +61,7 @@ public class Restaurant {
 	@Column (name = "date_mise_a_jour", nullable = false)
 	private LocalDateTime dateMiseAJour;
 		
-//	@JsonIgnore
+	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "restaurant_moyen_de_payment", 
 			joinColumns = @JoinColumn(name = "restaurant_id"),
