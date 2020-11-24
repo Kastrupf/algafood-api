@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
@@ -30,7 +31,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			EntiteNonTrouveeException ex, WebRequest request) {
 		
 		HttpStatus status = HttpStatus.NOT_FOUND;
-		ProblemType problemType = ProblemType.ENTITE_NON_TROUVEE;
+		ProblemType problemType = ProblemType.RESSOURCE_NON_TROUVE;
 		String detail = ex.getMessage();
 		
 		Problem problem = createProblemBuilder(status, problemType, detail).build();
@@ -63,7 +64,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
 	}
 		
-	
+	@Override
+	protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers,
+			HttpStatus status, WebRequest request) {
+		
+		ProblemType problemType = ProblemType.RESSOURCE_NON_TROUVE;
+		
+		String detail = String.format("La ressource %s, à laquelle vous avez essayé d'accéder, n'existe pas.",
+	           ex.getRequestURL());
+		
+		Problem problem = createProblemBuilder(status, problemType, detail).build();
+		
+		return handleExceptionInternal(ex, problem, headers, status, request);
+	}
+		
 	// MethodArgumentTypeMismatch est un soustype de TypeMismatchException.
 	// ResponseEntityExceptionHandler gere deja TypeMismatchException d'une certaine maniere, mais d'une façon plus generique.
 	// Ensuite, on specialise la methode handleTypeMismatch et on verifie si l'exception est une instance de MethodArgumentTypeMismatchException.
@@ -95,7 +109,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 	    return handleExceptionInternal(ex, problem, headers, status, request);
 	}
-	
+		
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
