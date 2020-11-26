@@ -2,6 +2,7 @@ package com.kastrupf.algafood.api.exceptionhandler;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -103,8 +105,18 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		ProblemType problemType = ProblemType.DONNEE_INVALIDE;
 		String detail = "Un ou plusieurs champs ne sont pas valides. Remplissez correctement et réessayez.";
 		
+		BindingResult bindingResult = ex.getBindingResult();
+		
+		List<Problem.Field> problemFields = bindingResult.getFieldErrors().stream()
+				.map(fieldError -> Problem.Field.builder()
+						.name(fieldError.getField())
+						.userMessage(fieldError.getDefaultMessage())
+						.build())
+				.collect(Collectors.toList());
+				
 		Problem problem = createProblemBuilder(status, problemType, detail)
-				.detail(detail)
+				.userMessage(detail)
+				.fields(problemFields)
 				.build();	
 		
 		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
@@ -140,7 +152,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 	    return super.handleTypeMismatch(ex, headers, status, request);
 	}
-
 			
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
@@ -162,8 +173,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		return handleExceptionInternal(ex, problem, headers, status, request);
 	}
-		
-
+	
 	@Override
 	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
@@ -182,8 +192,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		}
 		
 		return super.handleExceptionInternal(ex, body, headers, status, request);
-	}
-	
+	}	
 	
 	private ResponseEntity<Object> handleMethodArgumentTypeMismatch(
 	        MethodArgumentTypeMismatchException ex, HttpHeaders headers,
@@ -199,8 +208,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 	    return handleExceptionInternal(ex, problem, headers, status, request);
 	}
-	
-	
+		
 	private ResponseEntity<Object> handleInvalidFormat(InvalidFormatException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 
@@ -217,8 +225,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		return handleExceptionInternal(ex, problem, headers, status, request);
 	}
-	
-			
+				
 	private ResponseEntity<Object> handlePropertyBinding(PropertyBindingException ex,
 	        HttpHeaders headers, HttpStatus status, WebRequest request) {
 
@@ -236,8 +243,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	    
 	    return handleExceptionInternal(ex, problem, headers, status, request);
 	}        
-	
-	
+		
 	private Problem.ProblemBuilder createProblemBuilder(HttpStatus status,
 			ProblemType problemType, String detail) {
 		
@@ -248,8 +254,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			.title(problemType.getTitle())
 			.detail(detail);
 	}
-	
-		
+			
 	private String joinPath(List<Reference> references) {
 	    return references.stream()
 	        .map(ref -> ref.getFieldName())
