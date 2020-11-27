@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.BeanUtils;
@@ -14,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kastrupf.algafood.Groups;
 import com.kastrupf.algafood.domain.exception.CuisineNonTrouveeException;
 import com.kastrupf.algafood.domain.exception.GeneriqueException;
 import com.kastrupf.algafood.domain.model.Restaurant;
@@ -54,7 +55,8 @@ public class RestaurantController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Restaurant ajouter(@RequestBody @Valid Restaurant restaurant) {
+	public Restaurant ajouter(
+			@RequestBody @Validated(Groups.RegistreRestaurant.class) Restaurant restaurant) {
 	   
 		try {
 			return registreRestaurant.ajouter(restaurant);
