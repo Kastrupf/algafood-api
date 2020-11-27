@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,12 +23,13 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.fasterxml.jackson.databind.JsonMappingException.Reference;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.exc.PropertyBindingException;
+import com.kastrupf.algafood.core.validation.ValidationException;
 import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
 import com.kastrupf.algafood.domain.exception.EntiteNonTrouveeException;
 import com.kastrupf.algafood.domain.exception.GeneriqueException;
+import com.fasterxml.jackson.databind.JsonMappingException.Reference;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
@@ -39,6 +41,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	@Autowired
 	private MessageSource messageSource;
 
+	
+	@ExceptionHandler({ ValidationException.class })
+	public ResponseEntity<Object> handleValidationException(ValidationException ex, WebRequest request) {
+		return handleValidationInternal(ex, ex.getBindingResult(), new HttpHeaders(), 
+            HttpStatus.BAD_REQUEST, request);
+}     
+	
 	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<Object> handleUncaught(Exception ex, WebRequest request) {
@@ -103,32 +112,41 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
 	}
 	
+	private ResponseEntity<Object> handleValidationInternal(Exception ex, BindingResult bindingResult, HttpHeaders headers,
+			HttpStatus status, WebRequest request) {
+		        
+		    ProblemType problemType = ProblemType.DONNEE_INVALIDE;
+		    String detail = "Un ou plusieurs champs ne sont pas valides. Remplissez correctement et réessayez.";
+		    
+		    List<Problem.Object> problemObjects = bindingResult.getAllErrors().stream()
+		            .map(objectError -> {
+		                String message = messageSource.getMessage(objectError, LocaleContextHolder.getLocale());
+		                
+		                String name = objectError.getObjectName();
+		                
+		                if (objectError instanceof FieldError) {
+		                    name = ((FieldError) objectError).getField();
+		                }
+		                
+		                return Problem.Object.builder()
+		                    .name(name)
+		                    .userMessage(message)
+		                    .build();
+		            })
+		            .collect(Collectors.toList());
+		    
+		    Problem problem = createProblemBuilder(status, problemType, detail)
+		        .userMessage(detail)
+		        .objects(problemObjects)
+		        .build();
+		    
+		    return handleExceptionInternal(ex, problem, headers, status, request);
+		}
+		
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
-			HttpHeaders headers, HttpStatus status, WebRequest request) {
-		
-		ProblemType problemType = ProblemType.DONNEE_INVALIDE;
-		String detail = "Un ou plusieurs champs ne sont pas valides. Remplissez correctement et réessayez.";
-		
-		BindingResult bindingResult = ex.getBindingResult();
-		
-		List<Problem.Field> problemFields = bindingResult.getFieldErrors().stream()
-				.map(fieldError -> {
-					String message = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
-					
-					return Problem.Field.builder()
-						.name(fieldError.getField())
-						.userMessage(message)
-						.build();
-				})
-				.collect(Collectors.toList());
-				
-		Problem problem = createProblemBuilder(status, problemType, detail)
-				.userMessage(detail)
-				.fields(problemFields)
-				.build();	
-		
-		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
+	        HttpHeaders headers, HttpStatus status, WebRequest request) {
+	    return handleValidationInternal(ex, ex.getBindingResult(), headers, status, request);
 	}
 		
 	@Override
@@ -202,6 +220,15 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		return super.handleExceptionInternal(ex, body, headers, status, request);
 	}	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	private ResponseEntity<Object> handleMethodArgumentTypeMismatch(
 	        MethodArgumentTypeMismatchException ex, HttpHeaders headers,
