@@ -1,4 +1,4 @@
-package com.kastrupf.algafood;
+package com.kastrupf.algafood.core.validation;
 
 public interface Groups {
 	

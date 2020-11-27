@@ -27,7 +27,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.kastrupf.algafood.Groups;
+import com.kastrupf.algafood.core.validation.Groups;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -48,7 +48,7 @@ public class Restaurant {
 	private String nom;
 	
 	@NotNull 
-	@PositiveOrZero
+	@PositiveOrZero //(message = "{FraisTransport.invalide}")
 	@Column (name="frais_transport", nullable = false)
 	private BigDecimal fraisTransport;
 	
