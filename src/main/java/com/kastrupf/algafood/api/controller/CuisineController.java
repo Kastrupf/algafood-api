@@ -48,7 +48,7 @@ public class CuisineController {
 	}
 	
 	@PutMapping("/{id}")
-	public Cuisine mettreAJour(@PathVariable Long id,
+	public Cuisine mettreAJour(@PathVariable @Valid Long id,
 			@RequestBody Cuisine cuisine) {
 		Cuisine cuisineActuelle = registreCuisine.chercherOuEchouer(id);
 				

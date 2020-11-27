@@ -2,7 +2,6 @@ package com.kastrupf.algafood.api.exceptionhandler;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -20,12 +19,12 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
-import com.kastrupf.algafood.domain.exception.EntiteNonTrouveeException;
-import com.kastrupf.algafood.domain.exception.GeneriqueException;
 import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
+import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
+import com.kastrupf.algafood.domain.exception.EntiteNonTrouveeException;
+import com.kastrupf.algafood.domain.exception.GeneriqueException;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {

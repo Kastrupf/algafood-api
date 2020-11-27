@@ -5,5 +5,9 @@ public interface Groups {
 	public interface CuisineId {
 		
 	}
+	
+	public interface RegionId {
+		
+	}
 
 }

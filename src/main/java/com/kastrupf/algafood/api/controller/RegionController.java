@@ -2,6 +2,8 @@ package com.kastrupf.algafood.api.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,12 +43,12 @@ public class RegionController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Region ajouter(@RequestBody Region region) {
+	public Region ajouter(@RequestBody @Valid Region region) {
 		return registreRegion.ajouter(region);
 	}
 	    
 	@PutMapping("/{id}")
-	public Region mettreAJour(@PathVariable Long id,
+	public Region mettreAJour(@PathVariable @Valid Long id,
 			@RequestBody Region region) {
 		Region regionActuelle = registreRegion.chercherOuEchouer(id);
 		BeanUtils.copyProperties(region, regionActuelle, "id");

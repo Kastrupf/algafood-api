@@ -65,7 +65,7 @@ public class RestaurantController {
 	}
 
 	@PutMapping("/{id}")
-	public Restaurant mettreAJour(@PathVariable Long id,
+	public Restaurant mettreAJour(@PathVariable @Valid Long id,
 	        @RequestBody Restaurant restaurant) {
 	    Restaurant restaurantActuel = registreRestaurant.chercherOuEchouer(id);
 	    	    
