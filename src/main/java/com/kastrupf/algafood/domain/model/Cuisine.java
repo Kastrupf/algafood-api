@@ -25,14 +25,13 @@ import lombok.EqualsAndHashCode;
 @Entity
 public class Cuisine {
 	
-	@NotNull(groups = Groups.RegistreRestaurant.class)
+	@NotNull(groups = Groups.CuisineId.class)
 	@EqualsAndHashCode.Include
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
 	@NotBlank
-//  @JsonProperty("title")
 	@Column (nullable = false)
 	private String nom;
 	
