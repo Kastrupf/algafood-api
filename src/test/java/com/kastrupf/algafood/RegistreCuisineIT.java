@@ -3,7 +3,6 @@ package com.kastrupf.algafood;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.hasSize;
 
-import org.flywaydb.core.Flyway;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +12,10 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import com.kastrupf.algafood.domain.model.Cuisine;
+import com.kastrupf.algafood.domain.repository.CuisineRepository;
+import com.kastrupf.algafood.util.DatabaseCleaner;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -26,7 +29,10 @@ public class RegistreCuisineIT {
 		private int port;
 		
 		@Autowired
-		private Flyway flyway;
+		private DatabaseCleaner databaseCleaner;
+		
+		@Autowired
+		private CuisineRepository cuisines;
 		
 		@Before
 		public void setUp() {
@@ -34,7 +40,8 @@ public class RegistreCuisineIT {
 			RestAssured.port = port;
 			RestAssured.basePath = "/cuisines";
 			
-			flyway.migrate();
+			databaseCleaner.clearTables();
+			preparerDonnees();
 		}
 	
 	@Test
@@ -48,14 +55,14 @@ public class RegistreCuisineIT {
 	}
 	
 	@Test
-	public void doitAvoir4Cuisines_QuandRechercherCuisines() {
+	public void doitAvoir2Cuisines_QuandRechercherCuisines() {
 		given()
 			.accept(ContentType.JSON)
 		.when()
 			.get()
 		.then()
-			.body("", hasSize(4));
-//		.body("nom", hasItems("Française", "Italienne"));
+			.body("", hasSize(2));
+//		.body("nom", hasItems("Thailandaise", "Anglaise"));
 	}
 	
 	@Test
@@ -69,5 +76,21 @@ public class RegistreCuisineIT {
 		.then()
 			.statusCode(HttpStatus.CREATED.value());
 	}
+	
+	private void preparerDonnees() {
+		Cuisine cuisine1 = new Cuisine();
+		cuisine1.setNom("Thailandaise");
+		cuisines.save(cuisine1);
+		
+		Cuisine cuisine2 = new Cuisine();
+		cuisine2.setNom("Anglaise");
+		cuisines.save(cuisine2);
+		
+	}
+	
+	
+	
+	
+	
 	
 }
