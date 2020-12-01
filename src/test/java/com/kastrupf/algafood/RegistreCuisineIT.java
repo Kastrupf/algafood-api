@@ -1,6 +1,7 @@
 package com.kastrupf.algafood;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
 import org.junit.Before;
@@ -77,6 +78,29 @@ public class RegistreCuisineIT {
 			.statusCode(HttpStatus.CREATED.value());
 	}
 	
+	@Test
+	public void doitRetounerReponseEtStatusCorrects_QuandRechercherCuisineExistante() {
+		given()
+			.pathParam("id", 2)
+			.accept(ContentType.JSON)
+		.when()
+			.get("/{id}")
+		.then()
+			.statusCode(HttpStatus.OK.value())
+			.body("nom", equalTo("Anglaise"));
+	}
+	
+	@Test
+	public void doitRetounerStatus404_QuandRechercherCuisineInexistante() {
+		given()
+			.pathParam("id", 666)
+			.accept(ContentType.JSON)
+		.when()
+			.get("/{id}")
+		.then()
+			.statusCode(HttpStatus.NOT_FOUND.value());
+	}
+		
 	private void preparerDonnees() {
 		Cuisine cuisine1 = new Cuisine();
 		cuisine1.setNom("Thailandaise");
