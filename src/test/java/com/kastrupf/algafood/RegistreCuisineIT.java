@@ -17,6 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.kastrupf.algafood.domain.model.Cuisine;
 import com.kastrupf.algafood.domain.repository.CuisineRepository;
 import com.kastrupf.algafood.util.DatabaseCleaner;
+import com.kastrupf.algafood.util.ResourceUtils;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -26,25 +27,34 @@ import io.restassured.http.ContentType;
 @TestPropertySource("/application-test.properties")
 public class RegistreCuisineIT {
 	
-		@LocalServerPort
-		private int port;
-		
-		@Autowired
-		private DatabaseCleaner databaseCleaner;
-		
-		@Autowired
-		private CuisineRepository cuisines;
-		
-		@Before
-		public void setUp() {
-			RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-			RestAssured.port = port;
-			RestAssured.basePath = "/cuisines";
+	private static final int CUISINE_ID_INNEXISTENT = 100;
+
+	private Cuisine cuisineAmericaine;
+	private int quantiteCuisinesEnregistrees;
+	private String jsonCorrectCuisineChinoise;
 			
-			databaseCleaner.clearTables();
-			preparerDonnees();
-		}
-	
+	@LocalServerPort
+	private int port;
+		
+	@Autowired
+	private DatabaseCleaner databaseCleaner;
+		
+	@Autowired
+	private CuisineRepository cuisines;
+		
+	@Before
+	public void setUp() {
+		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+		RestAssured.port = port;
+		RestAssured.basePath = "/cuisines";
+		
+		databaseCleaner.clearTables();
+		preparerDonnees();
+		
+		jsonCorrectCuisineChinoise = ResourceUtils.getContentFromResource(
+				"/json/correct/cuisine-chinoise.json");
+	}
+
 	@Test
 	public void doitRetounerStatus200_QuandRechercherCuisines() {
 		given()
@@ -56,20 +66,20 @@ public class RegistreCuisineIT {
 	}
 	
 	@Test
-	public void doitAvoir2Cuisines_QuandRechercherCuisines() {
+	public void doitRetournerLaQuantiteCorrectDeCuisines_QuandRechercherCuisines() {
 		given()
 			.accept(ContentType.JSON)
 		.when()
 			.get()
 		.then()
-			.body("", hasSize(2));
-//		.body("nom", hasItems("Thailandaise", "Anglaise"));
+			.body("", hasSize(quantiteCuisinesEnregistrees));
+
 	}
 	
 	@Test
 	public void doitRetounerStatus201_QuandEnregistrerCuisine() {
 		given()
-			.body("{ \"nom\": \"Brésilienne\" }")
+			.body(jsonCorrectCuisineChinoise)
 			.contentType(ContentType.JSON)
 			.accept(ContentType.JSON)
 		.when()
@@ -81,19 +91,19 @@ public class RegistreCuisineIT {
 	@Test
 	public void doitRetounerReponseEtStatusCorrects_QuandRechercherCuisineExistante() {
 		given()
-			.pathParam("id", 2)
+			.pathParam("id", cuisineAmericaine.getId())
 			.accept(ContentType.JSON)
 		.when()
 			.get("/{id}")
 		.then()
 			.statusCode(HttpStatus.OK.value())
-			.body("nom", equalTo("Anglaise"));
+			.body("nom", equalTo(cuisineAmericaine.getNom()));
 	}
 	
 	@Test
 	public void doitRetounerStatus404_QuandRechercherCuisineInexistante() {
 		given()
-			.pathParam("id", 666)
+			.pathParam("id", CUISINE_ID_INNEXISTENT)
 			.accept(ContentType.JSON)
 		.when()
 			.get("/{id}")
@@ -102,19 +112,14 @@ public class RegistreCuisineIT {
 	}
 		
 	private void preparerDonnees() {
-		Cuisine cuisine1 = new Cuisine();
-		cuisine1.setNom("Thailandaise");
-		cuisines.save(cuisine1);
-		
-		Cuisine cuisine2 = new Cuisine();
-		cuisine2.setNom("Anglaise");
-		cuisines.save(cuisine2);
-		
+		Cuisine cuisineThailandaise = new Cuisine();
+		cuisineThailandaise.setNom("Thailandaise");
+	    cuisines.save(cuisineThailandaise);
+
+	    cuisineAmericaine = new Cuisine();
+	    cuisineAmericaine.setNom("Americaine");
+	    cuisines.save(cuisineAmericaine);
+	    
+	    quantiteCuisinesEnregistrees = (int) cuisines.count();
 	}
-	
-	
-	
-	
-	
-	
 }
