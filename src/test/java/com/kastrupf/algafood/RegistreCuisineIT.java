@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,14 +21,17 @@ public class RegistreCuisineIT {
 	
 		@LocalServerPort
 		private int port;
+		
+		@Before
+		public void setUp() {
+			RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+			RestAssured.port = port;
+			RestAssured.basePath = "/cuisines";
+		}
 	
 	@Test
 	public void doitRetounerStatus200_QuandRechercherCuisines() {
-		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-				
 		given()
-			.basePath("/cuisines")
-			.port(port)
 			.accept(ContentType.JSON)
 		.when()
 			.get()
@@ -37,11 +41,7 @@ public class RegistreCuisineIT {
 	
 	@Test
 	public void doitAvoir4Cuisines_QuandRechercherCuisines() {
-		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
-		
 		given()
-			.basePath("/cuisines")
-			.port(port)
 			.accept(ContentType.JSON)
 		.when()
 			.get()
