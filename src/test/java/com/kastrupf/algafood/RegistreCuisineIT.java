@@ -15,7 +15,7 @@ import com.kastrupf.algafood.domain.service.RegistreCuisineService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class RegistreCuisineIntegrationTests {
+public class RegistreCuisineIT {
 
 	@Autowired
 	private RegistreCuisineService registreCuisine;
