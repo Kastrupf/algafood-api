@@ -115,7 +115,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	private ResponseEntity<Object> handleValidationInternal(Exception ex, BindingResult bindingResult, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
 		        
-		    ProblemType problemType = ProblemType.DONNEE_INVALIDE;
+		    ProblemType problemType = ProblemType.DONNEES_INVALIDES;
 		    String detail = "Un ou plusieurs champs ne sont pas valides. Remplissez correctement et réessayez.";
 		    
 		    List<Problem.Object> problemObjects = bindingResult.getAllErrors().stream()
