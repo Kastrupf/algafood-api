@@ -1,6 +1,8 @@
 package com.kastrupf.algafood;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +22,7 @@ public class RegistreCuisineIT {
 		private int port;
 	
 	@Test
-	public void doitRetounerStatus200_QuandRechercheCuisines() {
+	public void doitRetounerStatus200_QuandRechercherCuisines() {
 		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
 				
 		given()
@@ -31,5 +33,20 @@ public class RegistreCuisineIT {
 			.get()
 		.then()
 			.statusCode(HttpStatus.OK.value());
+	}
+	
+	@Test
+	public void doitAvoir4Cuisines_QuandRechercherCuisines() {
+		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
+		
+		given()
+			.basePath("/cuisines")
+			.port(port)
+			.accept(ContentType.JSON)
+		.when()
+			.get()
+		.then()
+			.body("", hasSize(4));
+//		.body("nom", hasItems("Française", "Italienne"));
 	}
 }
