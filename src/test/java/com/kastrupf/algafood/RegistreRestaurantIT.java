@@ -151,7 +151,7 @@ public class RegistreRestaurantIT {
     }
     
     @Test
-    public void doitRetounerStatus404_QuandRechercherrestaurantInexistant() {
+    public void doitRetounerStatus404_QuandRechercherRestaurantInexistant() {
         given()
             .pathParam("id", RESTAURANT_ID_INEXISTANT)
             .accept(ContentType.JSON)

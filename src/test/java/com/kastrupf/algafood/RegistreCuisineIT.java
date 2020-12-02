@@ -101,7 +101,7 @@ public class RegistreCuisineIT {
 	}
 	
 	@Test
-	public void doitRetounerStatus404_QuandRechercherCuisineInexistante() {
+	public void doitRetounerStatus404_QuandRechercherCuisineInnexistante() {
 		given()
 			.pathParam("id", CUISINE_ID_INNEXISTENT)
 			.accept(ContentType.JSON)
