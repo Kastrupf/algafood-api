@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
 import com.kastrupf.algafood.domain.exception.RegionNonTrouveeException;
@@ -19,10 +20,12 @@ public class RegistreRegionService {
 	@Autowired
 	private RegionRepository regions;
 	
+	@Transactional
 	public Region ajouter(Region region) {
 		return regions.save(region);
 	}
 	
+	@Transactional
 	public void supprimer(Long id) {
 		try {
 			regions.deleteById(id);

@@ -2,6 +2,7 @@ package com.kastrupf.algafood.domain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kastrupf.algafood.domain.exception.RestaurantNonTrouveException;
 import com.kastrupf.algafood.domain.model.Cuisine;
@@ -17,16 +18,17 @@ public class RegistreRestaurantService {
 	@Autowired
 	private RegistreCuisineService registreCuisine;
 	
-		public Restaurant ajouter(Restaurant restaurant) {
-			Long cuisineId = restaurant.getCuisine().getId();
-			Cuisine cuisine = registreCuisine.chercherOuEchouer(cuisineId);
-			restaurant.setCuisine(cuisine);
+	@Transactional
+	public Restaurant ajouter(Restaurant restaurant) {
+		Long cuisineId = restaurant.getCuisine().getId();
+		Cuisine cuisine = registreCuisine.chercherOuEchouer(cuisineId);
+		restaurant.setCuisine(cuisine);
 			
-			return restaurants.save(restaurant);
-		}
-		
-		public Restaurant chercherOuEchouer(Long id) {
-		    return restaurants.findById(id)
-		        .orElseThrow(() -> new RestaurantNonTrouveException(id));
-		}
+		return restaurants.save(restaurant);
+	}
+	
+	public Restaurant chercherOuEchouer(Long id) {
+	    return restaurants.findById(id)
+	        .orElseThrow(() -> new RestaurantNonTrouveException(id));
+	}
 }

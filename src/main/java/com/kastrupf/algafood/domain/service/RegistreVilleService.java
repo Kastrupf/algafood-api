@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.kastrupf.algafood.domain.exception.EntiteEnCoursUtilisationException;
 import com.kastrupf.algafood.domain.exception.VilleNonTrouveeException;
@@ -23,7 +24,7 @@ public class RegistreVilleService {
 	@Autowired
 	private RegistreRegionService registreRegion;
 	
-	
+	@Transactional
 	public Ville ajouter(Ville ville) {
         Long regionId = ville.getRegion().getId();
         Region region = registreRegion.chercherOuEchouer(regionId);
@@ -32,23 +33,24 @@ public class RegistreVilleService {
         
         return villes.save(ville);
     }
-		
-		public void supprimer(Long id) {
-			try {
-				villes.deleteById(id);
+	
+	@Transactional
+	public void supprimer(Long id) {
+		try {
+			villes.deleteById(id);
 				
-			} catch (EmptyResultDataAccessException e) {	
-				throw new VilleNonTrouveeException(id);
-				
-			} catch (DataIntegrityViolationException e) {
-				throw new EntiteEnCoursUtilisationException(
-						String.format(MSG_VILLE_IN_USE, id));
-			}
+		} catch (EmptyResultDataAccessException e) {	
+			throw new VilleNonTrouveeException(id);
+			
+		} catch (DataIntegrityViolationException e) {
+			throw new EntiteEnCoursUtilisationException(
+				String.format(MSG_VILLE_IN_USE, id));
+		}
 	}
 		
-		public Ville chercherOuEchouer(Long id) {
-		    return villes.findById(id)
-		        .orElseThrow(() -> new VilleNonTrouveeException(id));
-		}    
+	public Ville chercherOuEchouer(Long id) {
+		return villes.findById(id)
+		   .orElseThrow(() -> new VilleNonTrouveeException(id));
+	}    
 		
 }
